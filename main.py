@@ -3,7 +3,7 @@ from slugify import slugify
 from tqdm import tqdm
 from utils import COOKIES, HEADERS, create_folder, save_json, load_json
 import os
-import pandas as pd
+# import pandas as pd
 import requests
 
 
