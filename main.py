@@ -69,41 +69,41 @@ def get_threads(start, end):
     # GET THREADS
     for page in range(start, end + 1):
         url = f"https://f319.com/forums/thi-truong-chung-khoan.3/page-{page}"
-        # try:
-        response = requests.get(
-            url,
-            cookies=COOKIES,
-            headers=HEADERS
-        )
-        if response.status_code == 200:
-            create_folder(f"data/page-{page}")
-            page_source = BeautifulSoup(response.text, "html.parser")
-            print(f"========== TRANG {page} ==========")
-            thread_elements = page_source.select("li.discussionListItem")
-            for thread_element in thread_elements:
-                thread = dict()
-                thread["page"] = page
+        try:
+            response = requests.get(
+                url,
+                cookies=COOKIES,
+                headers=HEADERS
+            )
+            if response.status_code == 200:
+                create_folder(f"data/page-{page}")
+                page_source = BeautifulSoup(response.text, "html.parser")
+                print(f"========== TRANG {page} ==========")
+                thread_elements = page_source.select("li.discussionListItem")
+                for thread_element in thread_elements:
+                    thread = dict()
+                    thread["page"] = page
 
-                name = thread_element.select_one("h3.title")
-                thread["name"] = name.get_text().strip() if name else None
+                    name = thread_element.select_one("h3.title")
+                    thread["name"] = name.get_text().strip() if name else None
 
-                url = name.find("a")
-                thread["url"] = "https://f319.com/" + url.get("href").strip() if url else None
+                    url = name.find("a")
+                    thread["url"] = "https://f319.com/" + url.get("href").strip() if url else None
 
-                print("Đang cào threads: ", thread["name"], thread["url"])
+                    print("Đang cào threads: ", thread["name"], thread["url"])
 
-                date = thread_element.select_one(".posterDate").select_one("span.DateTime")
-                thread["date"] = date.get_text().strip() if date else ""
+                    date = thread_element.select_one(".posterDate").select_one("span.DateTime")
+                    thread["date"] = date.get_text().strip() if date else ""
 
-                thread["author"] = thread_element.get("data-author")
+                    thread["author"] = thread_element.get("data-author")
 
-                thread["posts"] = get_thread(thread["url"]) if thread["url"] else []
+                    thread["posts"] = get_thread(thread["url"]) if thread["url"] else []
 
-                save_json(thread, f"data/page-{page}/page-{page}-{slugify(thread['url'])}.json")
-        else:
-            print(f"Lỗi {response.status_code} tại trang {url}")
-        # except Exception as err:
-        #     print(f"Lỗi tại trang {page}: {err}")
+                    save_json(thread, f"data/page-{page}/page-{page}-{slugify(thread['url'])}.json")
+            else:
+                print(f"Lỗi {response.status_code} tại trang {url}")
+        except Exception as err:
+            print(f"Lỗi tại trang {page}: {err}")
     return True
 
 
