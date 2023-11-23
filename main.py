@@ -1,5 +1,3 @@
-#!/Users/hoangkhanh/anaconda3/envs/ds/bin/python3
-
 from bs4 import BeautifulSoup
 from slugify import slugify
 from tqdm import tqdm
