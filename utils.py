@@ -34,7 +34,7 @@ def create_folder(folder_name = "data"):
 
 
 def save_json(data, f_path):
-    with open(f_path, "w", encoding="utf-8") as fp:
+    with open(f_path, "w") as fp:
         # fp.write(json.dumps(data, indent=4, sort_keys=True, default=str, ensure_ascii=False).encode("utf8"))
         json.dump(data, fp, indent=4, sort_keys=True, default=str, ensure_ascii=False)
 
