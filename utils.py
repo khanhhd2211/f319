@@ -28,9 +28,9 @@ HEADERS = {
 }
 
 
-def create_backup_folder():
-    if not os.path.exists('backup'):
-        os.mkdir('backup')
+def create_folder(folder_name = "data"):
+    if not os.path.exists(folder_name):
+        os.mkdir(folder_name)
 
 
 def save_json(data, f_path):

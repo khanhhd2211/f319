@@ -1,11 +1,12 @@
 #!/Users/hoangkhanh/anaconda3/envs/ds/bin/python3
 
-from tqdm import tqdm
-import requests
-import pandas as pd
-import os
-from utils import COOKIES, HEADERS, create_backup_folder, save_json, load_json
 from bs4 import BeautifulSoup
+from slugify import slugify
+from tqdm import tqdm
+from utils import COOKIES, HEADERS, create_folder, save_json, load_json
+import os
+import pandas as pd
+import requests
 
 
 def get_data(backup=False):
@@ -66,9 +67,7 @@ def get_thread(thread_link):
     return posts
 
 
-def get_threads(start, end, data):
-    threads = []
-
+def get_threads(start, end):
     # GET THREADS
     for page in range(start, end + 1):
         url = f"https://f319.com/forums/thi-truong-chung-khoan.3/page-{page}"
@@ -79,6 +78,7 @@ def get_threads(start, end, data):
                 headers=HEADERS
             )
             if response.status_code == 200:
+                create_folder(f"data/page-{page}")
                 page_source = BeautifulSoup(response.text, "html.parser")
                 print(f"========== TRANG {page} ==========")
                 thread_elements = page_source.select("li.discussionListItem")
@@ -101,31 +101,20 @@ def get_threads(start, end, data):
 
                     thread["posts"] = get_thread(thread["url"]) if thread["url"] else []
 
-                    threads.append(thread)
-
-                    data += threads
-
-                    # backup file after avery 50 pages
-                    if page % 50 == 0:
-                        save_json(data, f"./backup/threads_start{start}_end{page}.json")
-
+                    save_json(thread, f"data/page-{page}/page-{page}-{slugify(thread['url'])}.json")
             else:
                 print(f"Lỗi {response.status_code} tại trang {url}")
         except Exception as err:
-            print("Lỗi tại trang {page}: {err}")
-
-    save_json(data, f"./threads_all_start{start}_end{end}.json")
+            print(f"Lỗi tại trang {page}: {err}")
     return True
 
 
 if __name__ == "__main__":
     while True:
         print("Bắt đầu cào dữ liệu, f319.com...")
-        create_backup_folder()
-        has_backup = input("Bạn có file backup? (y/[n]): ") or "n"
-        df_all = get_data(backup=(has_backup == "y"))
+        create_folder()
         start_page = int(input("   - Bắt đầu cào từ trang bao nhiêu? [default=1]: ") or 1)
         max_page = int(input("   - Kết thúc cào tại trang bao nhiêu? [default=1000]: ") or 1000)
-        done = get_threads(start_page, max_page, df_all)
+        done = get_threads(start_page, max_page)
         if done:
             break
